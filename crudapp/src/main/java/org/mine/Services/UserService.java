@@ -4,24 +4,39 @@ import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.panache.common.Page;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import org.mine.Mappers.UserMapper;
-import org.mine.Models.User;
+import org.mine.domain.user.User;
 import io.smallrye.mutiny.Uni;
+import org.mine.common.exception.BusinessException;
+import org.mine.domain.user.UserStatus;
 import org.mine.dto.UserCreateDTO;
 import org.mine.dto.UserResponseDTO;
+import org.mine.repository.UserRespository;
 
 import java.util.List;
 
 @ApplicationScoped
 public class UserService {
 
-    public Uni<User> create(UserCreateDTO dto) {
+    @Inject
+    UserRespository userRespository;
 
-        User user = new User();
-        user.name = dto.name;
-        user.email = dto.email;
-        return Panache.withTransaction(user::persist)
-                .replaceWith(user);
+    @Inject
+    UserMapper mapper;
+
+    public Uni<UserResponseDTO> create(UserCreateDTO dto) {
+        return userRespository.findByEmail(dto.email())
+                .onItem()
+                .ifNotNull().failWith(() ->
+                        new BusinessException("Email already exists"))
+                .flatMap(v ->{
+                    User user = mapper.toEntity(dto);
+                    user.setStatus(UserStatus.ACTIVE);
+                    return userRespository.persist(user)
+                            .map(mapper::toDTO);
+                });
+
     }
 
     public Uni<UserResponseDTO> find(Long id) {

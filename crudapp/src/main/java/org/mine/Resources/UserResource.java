@@ -7,8 +7,8 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.mine.Models.User;
 import org.mine.Services.UserService;
+import org.mine.application.user.CreateUserUseCase;
 import org.mine.dto.UserCreateDTO;
 import org.mine.dto.UserResponseDTO;
 
@@ -23,11 +23,17 @@ public class UserResource {
     @Inject
     UserService userService;
 
+    @Inject
+    CreateUserUseCase createUser;
+
     @POST
     public Uni<Response> create(@Valid UserCreateDTO dto) {
-        return userService.create(dto)
-                .map(user -> Response.status(Response.Status.CREATED)
-                        .entity(user).build());
+        return createUser.execute(dto)
+                .map(user ->
+                        Response.status(Response.Status.CREATED)
+                                .entity(user)
+                                .build()
+                );
     }
 
     @GET

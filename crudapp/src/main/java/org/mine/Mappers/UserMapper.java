@@ -1,16 +1,20 @@
 package org.mine.Mappers;
 
-import org.mine.Models.User;
-import org.mine.Resources.UserResource;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mine.domain.user.User;
+import org.mine.dto.UserCreateDTO;
 import org.mine.dto.UserResponseDTO;
 
-public class UserMapper {
+@Mapper(componentModel = "cdi")
+public interface UserMapper {
 
-    public static UserResponseDTO toDTO(User user) {
-        UserResponseDTO dto = new UserResponseDTO();
-        dto.id = user.id;
-        dto.name = user.name;
-        dto.email = user.email;
-        return dto;
-    }
+    //DTO -> Entity
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    User toEntity(UserCreateDTO dto);
+
+    //Entity -> DTO
+    UserResponseDTO toDTO(User user);
+
 }
