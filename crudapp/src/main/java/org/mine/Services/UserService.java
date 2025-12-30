@@ -43,7 +43,7 @@ public class UserService {
        return User.findById(id)
                .onItem()
                .ifNull().failWith(() -> new RuntimeException("User not found"))
-               .map(entity -> UserMapper.toDTO((User) entity));
+               .map(entity -> mapper.toDTO((User) entity));
     }
 
     public Uni<Boolean> delete(Long id) {
@@ -57,7 +57,7 @@ public class UserService {
                 .page(Page.of(page, size))
                 .list()
                 .map(users -> users.stream()
-                        .map(u -> UserMapper.toDTO((User) u))
+                        .map(u -> mapper.toDTO((User) u))
                         .toList()
                 );
     }
@@ -69,8 +69,8 @@ public class UserService {
                         .ifNull().failWith(() ->
                                 new RuntimeException("User not found"))
                         .invoke(user -> {
-                                user.name = dto.name;
-                                user.email = dto.email;
+                                user.name = dto.name();
+                                user.email = dto.email();
                         })
         );
     }
