@@ -9,11 +9,11 @@ import java.time.Instant;
 @Table(name = "hotels")
 public class Hotel extends PanacheEntity {
 
+    @Column(name = "hotel_id", nullable = false, unique = true)
+    public String code;
+
     @Column(nullable = false)
     public String name;
-
-    @Column(nullable = false, unique = true)
-    public String code;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
